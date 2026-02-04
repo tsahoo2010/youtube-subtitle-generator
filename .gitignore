@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+
+# Temporary files - videos, audio, subtitles
+backend/temp/*.mp4
+backend/temp/*.mp3
+backend/temp/*.webm
+backend/temp/*.vtt
+
+# Keep only essential HTML files in temp
+!backend/temp/app.html
+!backend/temp/index.html
+!backend/temp/video-with-subtitles.html
+
+# Temporary trigger files
+trigger.txt
+backend/trigger.txt
+
+# Log files
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+dist/
+build/
+
+# Temporary player scripts
+*player-script.js
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
