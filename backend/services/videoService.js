@@ -29,14 +29,14 @@ class VideoService {
       console.log('📹 Getting video information...');
       
       const ytDlpExe = path.join(this.pythonScriptsPath, 'yt-dlp.exe');
-      const command = `"${ytDlpExe}" --dump-json --no-warnings "${videoUrl}"`;
+      const command = `"${ytDlpExe}" --dump-json --no-warnings --skip-download "${videoUrl}"`;
       
       const { stdout, stderr } = await execPromise(command, {
         env: {
           ...process.env,
           PATH: `${this.pythonPath};${this.pythonScriptsPath};${this.ffmpegPath};${process.env.PATH}`
         },
-        maxBuffer: 10 * 1024 * 1024 // 10MB buffer
+        maxBuffer: 50 * 1024 * 1024 // 50MB buffer - increased for large playlists/metadata
       });
 
       if (stderr && !stderr.includes('WARNING')) {

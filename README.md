@@ -5,14 +5,17 @@ A full-stack application that generates and translates subtitles for YouTube vid
 ## Features
 
 - ✅ Extract audio from YouTube videos
-- ✅ Generate subtitles using AI speech-to-text (AssemblyAI)
-- ✅ Translate subtitles into multiple languages:
-  - English (direct transcription)
-  - Spanish (via Google Translate)
-  - Hindi (via Google Translate)
+- ✅ **Multi-language transcription** - Transcribe videos in:
+  - English 🇬🇧
+  - Spanish 🇪🇸
+  - Hindi 🇮🇳
+  - Chinese 🇨🇳
+- ✅ **Multi-language subtitles** - Generate subtitles in any of the above languages
+- ✅ AI-powered speech-to-text using AssemblyAI
+- ✅ Automatic translation between languages using Google Translate
 - ✅ Download YouTube videos locally to bypass embedding restrictions
 - ✅ Display subtitles synced with local video playback
-- ✅ Modern, responsive UI with Video.js player
+- ✅ Modern, responsive UI built with React and Tailwind CSS
 - ✅ Real-time subtitle language switching
 - ✅ Support for WebVTT subtitle format
 - ✅ Error handling for invalid or private videos
@@ -28,10 +31,12 @@ A full-stack application that generates and translates subtitles for YouTube vid
 - **FFmpeg** - Audio/video processing
 
 ### Frontend
-- **HTML5 + JavaScript** - Simple, standalone web interface
-- **HTML5 Video Element** - Native video player with subtitle support
+- **React 18** - Modern UI framework
+- **Vite** - Fast development server and build tool
+- **Tailwind CSS** - Utility-first CSS framework
+- **Axios** - HTTP client for API requests
+- **Video.js** - Advanced HTML5 video player with subtitle support
 - **WebVTT** - Web Video Text Tracks for subtitle format
-- **Python HTTP Server** - Serves static files for development
 
 ## Project Structure
 
@@ -39,23 +44,34 @@ A full-stack application that generates and translates subtitles for YouTube vid
 youtube-subtitle-generator/
 ├── backend/
 │   ├── services/
-│   │   ├── transcriptionService.js    # AssemblyAI integration
+│   │   ├── transcriptionService.js    # AssemblyAI integration (multi-language)
 │   │   ├── translationService.js      # Google Translate integration
-│   │   └── videoService.js            # YouTube video/audio download with yt-dlp
+│   │   ├── videoService.js            # YouTube video/audio download with yt-dlp
+│   │   └── deepTranslator.py          # Python translation fallback
 │   ├── routes/
 │   │   └── videoRoutes.js             # API endpoints
 │   ├── utils/
 │   │   └── subtitleUtils.js           # Subtitle formatting (WebVTT)
 │   ├── temp/                          # Temporary files (videos, subtitles)
-│   │   ├── app.html                   # Main web interface
-│   │   ├── video-with-subtitles.html  # Simple video player
-│   │   ├── download-video.bat         # Batch script for manual downloads
 │   │   └── *.vtt                      # Generated subtitle files
 │   ├── server.js                      # Express server
 │   ├── package.json
 │   └── .env
 │
-└── frontend/                          # (Legacy React app - not actively used)
+└── frontend/
+    ├── src/
+    │   ├── components/
+    │   │   ├── LanguageSelector.jsx   # Dual language selector (source/target)
+    │   │   ├── VideoPlayer.jsx        # YouTube embed player
+    │   │   ├── LocalVideoPlayer.jsx   # Local video with subtitles
+    │   │   ├── URLInput.jsx           # YouTube URL input
+    │   │   └── VideoInfo.jsx          # Video metadata display
+    │   ├── services/
+    │   │   └── api.js                 # Backend API client
+    │   ├── App.jsx                    # Main application component
+    │   └── main.jsx                   # Application entry point
+    ├── package.json
+    └── vite.config.js
 ```
 
 ## Installation & Setup
@@ -136,33 +152,36 @@ cd c:\Work\youtube-subtitle-generator\backend
 npm start
 ```
 
-**Terminal 2 - Start HTTP Server (for UI):**
+**Terminal 2 - Start Frontend Development Server:**
 ```powershell
-cd c:\Work\youtube-subtitle-generator\backend\temp
-python -m http.server 8000
+cd c:\Work\youtube-subtitle-generator\frontend
+npm install
+npm run dev
 ```
 
 The application will be available at:
-- **Web Interface**: http://localhost:8000/app.html
+- **Web Interface**: http://localhost:3000
 - **Backend API**: http://localhost:3001
 
 ## Usage
 
-1. **Open Web Interface**: Navigate to http://localhost:8000/app.html
+1. **Open Web Interface**: Navigate to http://localhost:3000
 2. **Enter YouTube URL**: Paste any public YouTube video URL into the input field
-3. **Select Language**: Choose your preferred subtitle language:
-   - English (original transcription)
-   - Spanish (Google Translated)
-   - Hindi (Google Translated)
-4. **Generate Subtitles**: Click "Generate Subtitles" button
-5. **Wait for Processing**: The app will:
+3. **Select Video Language (Source)**: Choose the language spoken in the video:
+   - English 🇬🇧
+   - Spanish 🇪🇸
+   - Hindi 🇮🇳
+   - Chinese 🇨🇳
+4. **Select Subtitle Language (Target)**: Choose your desired subtitle language (same options)
+5. **Generate Subtitles**: Click "Generate Subtitles" button
+6. **Wait for Processing**: The app will:
    - Download video file locally (~19MB for typical video)
    - Extract and download audio
-   - Transcribe audio to English text using AssemblyAI
-   - Translate to selected language (if not English) using Google Translate
+   - Transcribe audio in the specified source language using AssemblyAI
+   - Translate to target language (if different from source) using Google Translate
    - Generate time-synced WebVTT subtitle file
-6. **Watch Video**: Video plays locally with subtitles overlaid automatically
-7. **Try Different Languages**: Select a different language and regenerate to see translated subtitles
+7. **Watch Video**: Video plays locally with subtitles overlaid automatically
+8. **Change Languages**: Use the language selectors to switch subtitle language in real-time
 
 ## API Endpoints
 

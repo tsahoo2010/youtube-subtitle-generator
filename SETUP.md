@@ -27,21 +27,32 @@ npm start
 ```
 Wait for: `🚀 Server running on http://localhost:3001`
 
-**Terminal 2 - HTTP Server (for UI):**
+**Terminal 2 - Frontend Development Server:**
 ```powershell
-cd c:\Work\youtube-subtitle-generator\backend\temp
-python -m http.server 8000
+cd c:\Work\youtube-subtitle-generator\frontend
+npm install
+npm run dev
 ```
 
-Open: http://localhost:8000/app.html
+Open: http://localhost:3000
 
 ## Quick Test
 
 1. Use this test video: `https://www.youtube.com/watch?v=8wysIxzqgPI`
-2. Select language (English, Spanish, or Hindi)
-3. Click "Generate Subtitles"
-4. Wait 1-2 minutes for processing (downloads video locally)
-5. Video will play with subtitles!
+2. Select **Video Language** (the language spoken in the video)
+3. Select **Subtitle Language** (the language you want for subtitles)
+4. Click "Generate Subtitles"
+5. Wait 1-2 minutes for processing (downloads video locally)
+6. Video will play with subtitles!
+
+## Supported Languages
+
+- **English** 🇬🇧 - Full transcription and translation
+- **Spanish** 🇪🇸 - Full transcription and translation
+- **Hindi** 🇮🇳 - Full transcription and translation
+- **Chinese** 🇨🇳 - Full transcription and translation
+
+You can transcribe a video in any supported language and generate subtitles in any other supported language!
 
 ## Common Issues
 
@@ -72,5 +83,7 @@ Open: http://localhost:8000/app.html
 
 - Read the full README.md for detailed documentation
 - Explore the code in `backend/services/` and `frontend/src/components/`
-- Try different languages: Spanish, Hindi, Chinese
+- Try transcribing videos in different languages (Spanish, Hindi, Chinese)
+- Try translating between any language pair
 - Customize the UI in `frontend/src/App.jsx`
+- Adjust language mappings in `backend/services/transcriptionService.js`

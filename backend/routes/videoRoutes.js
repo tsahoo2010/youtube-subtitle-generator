@@ -56,7 +56,7 @@ router.post('/generate-subtitles', async (req, res, next) => {
   let audioPath = null;
 
   try {
-    const { url, language = 'english' } = req.body;
+    const { url, language = 'english', sourceLanguage = 'english' } = req.body;
 
     if (!url) {
       return res.status(400).json({ error: 'Video URL is required' });
@@ -79,18 +79,18 @@ router.post('/generate-subtitles', async (req, res, next) => {
     const { audioId, audioPath: downloadedAudioPath } = await videoService.downloadAudio(url);
     audioPath = downloadedAudioPath;
 
-    // Transcribe audio
-    console.log('🎙️ Transcribing audio...');
-    const { fullText, subtitles } = await transcriptionService.transcribeAudio(audioPath);
+    // Transcribe audio with source language
+    console.log(`🎙️ Transcribing ${sourceLanguage} audio...`);
+    const { fullText, subtitles } = await transcriptionService.transcribeAudio(audioPath, sourceLanguage);
 
-    // Translate if needed
+    // Translate if needed (if source and target languages differ)
     let finalSubtitles = subtitles;
-    if (language.toLowerCase() !== 'english') {
-      console.log(`🌐 Translating to ${language}...`);
+    if (language.toLowerCase() !== sourceLanguage.toLowerCase()) {
+      console.log(`🌐 Translating from ${sourceLanguage} to ${language}...`);
       finalSubtitles = await translationService.translateSubtitles(
         subtitles,
         language,
-        'english'
+        sourceLanguage
       );
     }
 
@@ -133,7 +133,7 @@ router.post('/generate-subtitles-local', async (req, res, next) => {
   let videoPath = null;
 
   try {
-    const { url, language = 'english' } = req.body;
+    const { url, language = 'english', sourceLanguage = 'english' } = req.body;
 
     if (!url) {
       return res.status(400).json({ error: 'Video URL is required' });
@@ -161,26 +161,26 @@ router.post('/generate-subtitles-local', async (req, res, next) => {
     const { audioId, audioPath: downloadedAudioPath } = await videoService.downloadAudio(url);
     audioPath = downloadedAudioPath;
 
-    // Transcribe audio
-    console.log('🎙️ Transcribing audio...');
-    const { fullText, subtitles } = await transcriptionService.transcribeAudio(audioPath);
+    // Transcribe audio with source language
+    console.log(`🎙️ Transcribing ${sourceLanguage} audio...`);
+    const { fullText, subtitles } = await transcriptionService.transcribeAudio(audioPath, sourceLanguage);
 
-    // Translate if needed
+    // Translate if needed (if source and target languages differ)
     let finalSubtitles = subtitles;
     let translationWarning = null;
-    if (language.toLowerCase() !== 'english') {
-      console.log(`🌐 Translating to ${language}...`);
+    if (language.toLowerCase() !== sourceLanguage.toLowerCase()) {
+      console.log(`🌐 Translating from ${sourceLanguage} to ${language}...`);
       try {
         finalSubtitles = await translationService.translateSubtitles(
           subtitles,
           language,
-          'english'
+          sourceLanguage
         );
       } catch (error) {
         console.error(`⚠️ Translation failed: ${error.message}`);
-        console.log(`📝 Using English subtitles as fallback`);
-        translationWarning = `Translation to ${language} failed. Showing English subtitles instead.`;
-        // Keep English subtitles as fallback
+        console.log(`📝 Using ${sourceLanguage} subtitles as fallback`);
+        translationWarning = `Translation to ${language} failed. Showing ${sourceLanguage} subtitles instead.`;
+        // Keep original language subtitles as fallback
         finalSubtitles = subtitles;
       }
     }

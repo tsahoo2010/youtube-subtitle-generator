@@ -16,6 +16,19 @@ class TranscriptionService {
   }
 
   /**
+   * Language codes mapping for AssemblyAI
+   */
+  getLanguageCode(language) {
+    const codes = {
+      'english': 'en',
+      'spanish': 'es',
+      'hindi': 'hi',
+      'chinese': 'zh'
+    };
+    return codes[language.toLowerCase()] || 'en';
+  }
+
+  /**
    * Get API key with runtime check
    */
   getApiKey() {
@@ -53,14 +66,25 @@ class TranscriptionService {
   /**
    * Request transcription from AssemblyAI
    */
-  async requestTranscription(audioUrl) {
+  async requestTranscription(audioUrl, sourceLanguage = 'english') {
     try {
+      const languageCode = this.getLanguageCode(sourceLanguage);
+      
+      const requestBody = {
+        audio_url: audioUrl
+      };
+
+      // If language is specified and not English, set it explicitly
+      // Otherwise use language detection
+      if (languageCode !== 'en') {
+        requestBody.language_code = languageCode;
+      } else {
+        requestBody.language_detection = true;
+      }
+
       const response = await axios.post(
         `${this.baseUrl}/transcript`,
-        {
-          audio_url: audioUrl,
-          language_detection: true
-        },
+        requestBody,
         {
           headers: {
             'authorization': this.getApiKey(),
@@ -155,14 +179,14 @@ class TranscriptionService {
   /**
    * Complete transcription pipeline
    */
-  async transcribeAudio(audioFilePath) {
+  async transcribeAudio(audioFilePath, sourceLanguage = 'english') {
     const apiKey = this.getApiKey(); // Will throw if not configured
 
-    console.log('📤 Uploading audio to AssemblyAI...');
+    console.log(`📤 Uploading audio to AssemblyAI...`);
     const audioUrl = await this.uploadAudio(audioFilePath);
 
-    console.log('🎙️ Requesting transcription...');
-    const transcriptId = await this.requestTranscription(audioUrl);
+    console.log(`🎙️ Requesting transcription for ${sourceLanguage} audio...`);
+    const transcriptId = await this.requestTranscription(audioUrl, sourceLanguage);
 
     console.log('⏳ Waiting for transcription to complete...');
     const { text, words } = await this.getTranscription(transcriptId);

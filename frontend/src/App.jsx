@@ -14,7 +14,8 @@ function App() {
   const [subtitleUrl, setSubtitleUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null); // For local playback
   const [useLocalPlayback, setUseLocalPlayback] = useState(true); // Default to local playback
-  const [selectedLanguage, setSelectedLanguage] = useState('english');
+  const [sourceLanguage, setSourceLanguage] = useState('english'); // Language of the video
+  const [targetLanguage, setTargetLanguage] = useState('english'); // Language for subtitles
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [error, setError] = useState('');
@@ -31,7 +32,7 @@ function App() {
     try {
       if (useLocalPlayback) {
         setLoadingMessage('Downloading video for local playback (this may take a few minutes)...');
-        const result = await generateSubtitlesLocal(url, selectedLanguage);
+        const result = await generateSubtitlesLocal(url, targetLanguage, sourceLanguage);
 
         if (result.success) {
           setVideoId(result.data.videoId);
@@ -51,7 +52,7 @@ function App() {
         await new Promise(resolve => setTimeout(resolve, 500));
 
         setLoadingMessage('Transcribing audio (this may take a few minutes)...');
-        const result = await generateSubtitles(url, selectedLanguage);
+        const result = await generateSubtitles(url, targetLanguage, sourceLanguage);
 
         if (result.success) {
           setVideoId(result.data.videoId);
@@ -75,11 +76,11 @@ function App() {
     }
   };
 
-  // Handle language change
-  const handleLanguageChange = async (language) => {
-    if (language === selectedLanguage) return;
+  // Handle target language change
+  const handleTargetLanguageChange = async (language) => {
+    if (language === targetLanguage) return;
 
-    setSelectedLanguage(language);
+    setTargetLanguage(language);
 
     if (!currentUrl || !videoId) return;
 
@@ -88,7 +89,7 @@ function App() {
     setLoadingMessage(`Translating subtitles to ${language}...`);
 
     try {
-      const result = await generateSubtitles(currentUrl, language);
+      const result = await generateSubtitles(currentUrl, language, sourceLanguage);
 
       if (result.success) {
         setSubtitleUrl(result.data.subtitleUrl);
@@ -100,6 +101,11 @@ function App() {
       setLoading(false);
       setLoadingMessage('');
     }
+  };
+
+  // Handle source language change
+  const handleSourceLanguageChange = (language) => {
+    setSourceLanguage(language);
   };
 
   return (
@@ -131,8 +137,10 @@ function App() {
         {!loading && !videoId && (
           <div className="max-w-3xl mx-auto mb-8">
             <LanguageSelector
-              selectedLanguage={selectedLanguage}
-              onLanguageChange={setSelectedLanguage}
+              sourceLanguage={sourceLanguage}
+              targetLanguage={targetLanguage}
+              onSourceLanguageChange={handleSourceLanguageChange}
+              onTargetLanguageChange={setTargetLanguage}
               disabled={loading}
             />
           </div>
@@ -154,8 +162,10 @@ function App() {
             {/* Language Selector */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <LanguageSelector
-                selectedLanguage={selectedLanguage}
-                onLanguageChange={handleLanguageChange}
+                sourceLanguage={sourceLanguage}
+                targetLanguage={targetLanguage}
+                onSourceLanguageChange={handleSourceLanguageChange}
+                onTargetLanguageChange={handleTargetLanguageChange}
                 disabled={loading}
               />
             </div>
@@ -199,7 +209,8 @@ function App() {
                   setSubtitleUrl(null);
                   setOriginalSubtitles(null);
                   setCurrentUrl('');
-                  setSelectedLanguage('english');
+                  setSourceLanguage('english');
+                  setTargetLanguage('english');
                   setError('');
                 }}
                 className="bg-gray-600 text-white py-3 px-8 rounded-lg font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"

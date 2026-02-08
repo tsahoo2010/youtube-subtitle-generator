@@ -17,11 +17,12 @@ export const getVideoInfo = async (url) => {
 /**
  * Generate subtitles for a video
  */
-export const generateSubtitles = async (url, language = 'english') => {
+export const generateSubtitles = async (url, targetLanguage = 'english', sourceLanguage = 'english') => {
   try {
     const response = await axios.post(`${API_BASE_URL}/video/generate-subtitles`, {
       url,
-      language
+      language: targetLanguage,
+      sourceLanguage
     });
     return response.data;
   } catch (error) {
@@ -32,11 +33,12 @@ export const generateSubtitles = async (url, language = 'english') => {
 /**
  * Generate subtitles and download video for local playback
  */
-export const generateSubtitlesLocal = async (url, language = 'english') => {
+export const generateSubtitlesLocal = async (url, targetLanguage = 'english', sourceLanguage = 'english') => {
   try {
     const response = await axios.post(`${API_BASE_URL}/video/generate-subtitles-local`, {
       url,
-      language
+      language: targetLanguage,
+      sourceLanguage
     }, {
       timeout: 600000 // 10 minutes timeout for video download
     });
